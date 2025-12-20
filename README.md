@@ -1,5 +1,7 @@
 # 🛡️ AKIR: Advanced Kernel-Level Integrity & Resilience Framework
 
+![Build Status](https://github.com/SHAdd0WTAka/AKIR-EDR/actions/workflows/build.yml/badge.svg)
+
 AKIR ist ein Proof-of-Concept (PoC) Framework zur Absicherung kritischer Windows-Infrastrukturen. Im Gegensatz zu klassischen EDR-Systemen, die primär auf Detektion setzen, fokussiert sich AKIR auf unüberwindbare Integrität und kryptografisch erzwungene Resilienz.
 
 ## 🎯 Kernphilosophie: "Assume Breach"
