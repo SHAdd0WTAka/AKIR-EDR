@@ -10,7 +10,7 @@ jobs:
   security-check:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Configure CMake
         # Wir nutzen den Standard-vcpkg-Pfad des Runners, verzichten aber auf manuelle Updates
@@ -24,7 +24,7 @@ jobs:
         run: cmake --build build --config Release
 
       - name: Upload Agent Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: AKIR_Agent_Windows_x64
           path: build/Release/AKIR_Agent.exe
@@ -41,3 +41,10 @@ jobs:
         shell: powershell
         run: |
           Write-Host "Verifying Binary Hardening Flags..."
+
+      - name: Upload Vcpkg Logs (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vcpkg-logs
+          path: build/vcpkg-manifest-install.log
