@@ -12,7 +12,7 @@ endif()
 # Include Directories für das gesamte Projekt
 include_directories(src/agent)
 
-find_package(sqlite3 REQUIRED)
+find_package(unofficial-sqlite3 CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 
@@ -23,7 +23,7 @@ add_executable(AKIR_Agent
     src/agent/AdminAuth.cpp
 )
 
-target_link_libraries(AKIR_Agent PRIVATE sqlite3 OpenSSL::SSL nlohmann_json::nlohmann_json)
+target_link_libraries(AKIR_Agent PRIVATE unofficial::sqlite3::sqlite3 OpenSSL::SSL nlohmann_json::nlohmann_json)
 
 # Tests Configuration
 enable_testing()
@@ -35,7 +35,7 @@ add_executable(AKIR_Tests
     src/agent/AdminAuth.cpp
 )
 
-target_link_libraries(AKIR_Tests PRIVATE GTest::gtest GTest::gtest_main OpenSSL::SSL)
+target_link_libraries(AKIR_Tests PRIVATE GTest::gtest GTest::gtest_main OpenSSL::SSL nlohmann_json::nlohmann_json)
 
 # Test Discovery (für ctest)
 include(GoogleTest)
