@@ -23,6 +23,12 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
+      - name: Upload Agent Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: AKIR_Agent_Windows_x64
+          path: build/Release/AKIR_Agent.exe
+
       - name: Run Unit Tests (2FA & Protocol Logic)
         run: |
           if (Test-Path build/Release/AKIR_Tests.exe) {
