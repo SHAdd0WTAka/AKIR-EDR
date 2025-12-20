@@ -1,0 +1,20 @@
+# Build artifacts
+/build/
+/bin/
+/dist/
+*.obj
+*.exe
+*.sys
+*.pdb
+*.ilk
+*.exp
+*.lib
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
