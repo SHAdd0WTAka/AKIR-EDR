@@ -6,6 +6,5 @@
     "openssl",
     "nlohmann-json",
     "gtest"
-  ],
-  "builtin-baseline": "3426db05a996481ca31cc95133484469f611ad5c"
+  ]
 }
