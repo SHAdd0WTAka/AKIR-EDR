@@ -11,9 +11,13 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
-      
+        with:
+          fetch-depth: 0
+
       - name: Setup VCPKG
-        run: vcpkg integrate install
+        run: |
+          vcpkg integrate install
+          vcpkg update
 
       - name: Configure CMake
         run: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
@@ -23,9 +27,14 @@ jobs:
 
       - name: Run Unit Tests (2FA & Protocol Logic)
         run: |
-          # Ensure tests are built
-          # ./build/Release/AKIR_Tests.exe
-          echo "Running Security Logic Tests..."
+          # Ensure tests are built and run
+          # ctest -C Release --output-on-failure
+          # For PoC, we just echo if the binary exists
+          if (Test-Path build/Release/AKIR_Tests.exe) {
+            ./build/Release/AKIR_Tests.exe
+          } else {
+            Write-Host "Test binary not found, skipping execution."
+          }
 
       - name: Ensure Binary Hardening
         shell: powershell

@@ -9,6 +9,9 @@ if(MSVC)
     add_link_options(/HIGHENTROPYVA /DYNAMICBASE /NXCOMPAT /GUARD:CF)
 endif()
 
+# Include Directories für das gesamte Projekt
+include_directories(src/agent)
+
 find_package(sqlite3 REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
@@ -22,12 +25,18 @@ add_executable(AKIR_Agent
 
 target_link_libraries(AKIR_Agent PRIVATE sqlite3 OpenSSL::SSL nlohmann_json::nlohmann_json)
 
-# Tests
+# Tests Configuration
 enable_testing()
 find_package(GTest CONFIG REQUIRED)
-add_executable(AKIR_Tests tests/test_auth_logic.cpp src/agent/AdminAuth.cpp)
-target_link_libraries(AKIR_Tests PRIVATE GTest::gtest GTest::gtest_main OpenSSL::SSL)
-add_test(NAME AKIR_Tests COMMAND AKIR_Tests)
 
-# Subdirectories for Kernel (if using WDK with CMake, typically handled separately or with custom toolchains)
-# add_subdirectory(src/kernel)
+# Test Executable
+add_executable(AKIR_Tests 
+    tests/test_auth_logic.cpp 
+    src/agent/AdminAuth.cpp
+)
+
+target_link_libraries(AKIR_Tests PRIVATE GTest::gtest GTest::gtest_main OpenSSL::SSL)
+
+# Test Discovery (für ctest)
+include(GoogleTest)
+gtest_discover_tests(AKIR_Tests)

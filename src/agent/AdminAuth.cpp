@@ -2,6 +2,7 @@
 #include <string>
 #include <ctime>
 #include <vector>
+#include "AdminAuth.h"
 
 using namespace std;
 
