@@ -1,0 +1,20 @@
+graph TD
+    subgraph Manager_Zone
+        M[Manager] -- "Generate Key & Approval" --> DB[(Admin-Roles DB)]
+    end
+
+    subgraph Admin_Daily_Workflow
+        A[Admin] -- "Input Secret Key" --> Tool[Auth-Tool]
+        Tool -- "Generates HTTPS Link" --> Link{Manual Change?}
+        Link -- "HTTPS to HTTP" --> Final[Verified Token]
+    end
+
+    subgraph Kernel_Enforcement
+        Final -- "IOCTL Reset Timer" --> Drv[Kernel Driver]
+        Drv -- "Protects" --> Agent[EDR Agent]
+        Agent -- "Scans RAM" --> SMSS[smss.exe]
+        SMSS -- "Mismatch detected" --> VSS[VSS Auto-Restore]
+    end
+
+    style VSS fill:#f96,stroke:#333,stroke-width:2px
+    style Drv fill:#bbf,stroke:#333,stroke-width:2px

@@ -1,0 +1,12 @@
+{
+  "name": "akir-framework",
+  "version-string": "1.0.0",
+  "dependencies": [
+    "sqlite3",
+    "openssl",
+    "nlohmann-json",
+    "gtest",
+    "pyotp"
+  ],
+  "builtin-baseline": "3426db05a996481ca31cc95133484469f611ad5c"
+}

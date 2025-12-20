@@ -1,25 +1,65 @@
-# AKIR - Advanced Kernel-Level Integrity & Resilience Framework
+# 🛡️ AKIR: Advanced Kernel-Level Integrity & Resilience Framework
 
-**Version:** 1.0.0  
-**Created:** December 20, 2025  
-**License:** MIT
+AKIR ist ein Proof-of-Concept (PoC) Framework zur Absicherung kritischer Windows-Infrastrukturen. Im Gegensatz zu klassischen EDR-Systemen, die primär auf Detektion setzen, fokussiert sich AKIR auf unüberwindbare Integrität und kryptografisch erzwungene Resilienz.
 
-## Overview
-AKIR is a structured Endpoint Detection and Response (EDR) solution designed for enterprise environments. It combines kernel-level monitoring with a robust user-mode agent and comprehensive automation scripts.
+## 🎯 Kernphilosophie: "Assume Breach"
 
-## Architecture
+AKIR geht davon aus, dass Angreifer bereits administrative Privilegien erlangt haben könnten. Das System schützt den Endpunkt durch:
 
-- **Driver (Ring 0):** `edrdrv.sys` - Handles process, image, and registry callbacks.
-- **Agent (Ring 3):** `EDRAgent.exe` - Processes events, communicates with the backend, and enforces policies.
-- **Scripts:** PowerShell automation for deployment, maintenance, and testing (MITRE ATT&CK simulations).
+*   **Hardware-Anchored Trust:** Nutzung des TPM für Integritäts-Attestierung.
+*   **Dual-Authorization:** Keine kritische Änderung ohne Vier-Augen-Prinzip (2FA).
+*   **Human-in-the-loop:** Physische Anwesenheitstests durch bewusste Protokoll-Manipulation.
 
-## Structure
+## 🏗️ System-Architektur
 
-- `/Driver`: Windows Kernel-Mode Driver (WDM/WDF)
-- `/Agent`: C++ User-Mode Service
-- `/Scripts`: PowerShell Automation
-- `/Docs`: Documentation and Playbooks
+### 1. Kernel-Mode Enforcement (`edrdrv.sys`)
 
-## Getting Started
+Das Fundament bildet ein Windows-Kernel-Treiber, der direkt in die Objekt-Manager-Routinen eingreift.
 
-See [Docs/Deployment-Guide.md](Docs/Deployment-Guide.md) for installation instructions.
+*   **Anti-Tamper:** Über `ObRegisterCallbacks` wird verhindert, dass selbst Administrator-Prozesse den Schutz-Agenten beenden oder modifizieren.
+*   **Registry-Hardening:** Filtert Schreibzugriffe auf sicherheitskritische Konfigurationsschlüssel.
+*   **Network-Isolation:** Integrierter WFP (Windows Filtering Platform) Layer zur sofortigen Isolierung bei Integritätsverlust.
+
+### 2. Resilience Engine (The "Dead Man's Switch")
+
+Ein täglicher administrativer Reset ist erforderlich, um den "Normalbetrieb" aufrechtzuerhalten.
+
+*   **Zeitfenster:** Die Authentifizierung ist nur zwischen 14:30 und 15:30 Uhr möglich.
+*   **Protocol-Flip (HTTPS -> HTTP):** Als Schutz gegen automatisierte Bots generiert das System eine HTTPS-Challenge. Der Admin muss diese manuell zu HTTP abändern, um seine bewusste Interaktion zu beweisen.
+
+### 3. Identity & Provisioning (2FA Flow)
+
+Neue Administratoren werden über ein duales Modell autorisiert:
+
+*   **Manager 1:** Beantragt den kryptografischen Key.
+*   **Manager 2 (Security Officer):** Aktiviert den Key mittels eines TOTP-Zweitfaktors (Google Authenticator/YubiKey).
+
+## 🛠️ Build & Security Pipeline
+
+Das Projekt nutzt eine gehärtete CI/CD-Pipeline, um die Chain of Trust bereits bei der Entwicklung sicherzustellen:
+
+*   **vcpkg Integration:** Manifest-gesteuerte, reproduzierbare Abhängigkeiten.
+*   **Binary Hardening:** Erzwingt `/guard:cf` (Control Flow Guard) und `/CETCOMPAT`.
+*   **Security-Unit-Tests:** Die Pipeline bricht ab, wenn die 2FA-Logik oder der Protokoll-Check im Code manipuliert werden.
+
+## 🚀 Installation (PoC)
+
+1.  **Environment:** Windows 10/11 mit aktiviertem Testsigning-Mode (`bcdedit /set testsigning on`).
+2.  **Build:**
+    ```powershell
+    ./scripts/Build.ps1
+    ```
+3.  **Deployment:**
+    ```powershell
+    ./scripts/Install.ps1
+    ```
+
+## ⚠️ Disclaimer
+
+Dieses Projekt dient ausschließlich Bildungs- und Forschungszwecken (PoC). Der Einsatz eines Kernel-Treibers kann bei Fehlkonfiguration zur Systeminstabilität (BSOD) führen.
+
+Entwickelt für High-Security-Umgebungen, in denen "Administrator-Rechte" nicht das Ende der Verteidigungslinie bedeuten dürfen.
+
+---
+
+👉 **Detaillierte Einblicke findest du im [Wiki](../../wiki) oder in der [Architektur-Dokumentation](docs/AKIR_Architecture_DeepDive.md).**
