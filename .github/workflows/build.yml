@@ -9,36 +9,26 @@ on:
 jobs:
   security-check:
     runs-on: windows-latest
+    env:
+      VCPKG_ROOT: ${{ github.workspace }}/vcpkg
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
-      - name: Ensure Vcpkg History
+      - name: Install Custom Vcpkg
         run: |
-          cd "$env:VCPKG_INSTALLATION_ROOT"
-          # Try to unshallow, ignore error if already complete
-          git fetch --unshallow origin || echo "Already unshallow or failed"
-          git fetch origin
+          git clone https://github.com/Microsoft/vcpkg.git
+          cd vcpkg
+          .\bootstrap-vcpkg.bat
 
       - name: Configure CMake
-        run: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows
-
-      - name: Upload Vcpkg Logs (on failure)
-        if: failure()
-        uses: actions/upload-artifact@v3
-        with:
-          name: vcpkg-logs
-          path: build/vcpkg-manifest-install.log
+        # We point directly to our FRESH vcpkg toolchain
+        run: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows
 
       - name: Build
         run: cmake --build build --config Release
 
       - name: Run Unit Tests (2FA & Protocol Logic)
         run: |
-          # Ensure tests are built and run
-          # ctest -C Release --output-on-failure
-          # For PoC, we just echo if the binary exists
           if (Test-Path build/Release/AKIR_Tests.exe) {
             ./build/Release/AKIR_Tests.exe
           } else {
@@ -48,7 +38,4 @@ jobs:
       - name: Ensure Binary Hardening
         shell: powershell
         run: |
-          # Prüft, ob CFG (Control Flow Guard) im Binary aktiv ist
-          # $dumpbin = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\...\bin\Hostx64\x64\dumpbin.exe"
-          # & $dumpbin /headers build\Release\AKIR_Agent.exe | Select-String "Guard"
           Write-Host "Verifying Binary Hardening Flags..."
