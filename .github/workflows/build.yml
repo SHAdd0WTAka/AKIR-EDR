@@ -9,20 +9,16 @@ on:
 jobs:
   security-check:
     runs-on: windows-latest
-    env:
-      VCPKG_ROOT: ${{ github.workspace }}/vcpkg
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Custom Vcpkg
-        run: |
-          git clone https://github.com/Microsoft/vcpkg.git
-          cd vcpkg
-          .\bootstrap-vcpkg.bat
-
       - name: Configure CMake
-        # We point directly to our FRESH vcpkg toolchain
-        run: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows
+        # Wir nutzen den Standard-vcpkg-Pfad des Runners, verzichten aber auf manuelle Updates
+        run: |
+          cmake -B build -S . `
+            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" `
+            -DVCPKG_MANIFEST_MODE=ON `
+            -DVCPKG_TARGET_TRIPLET=x64-windows
 
       - name: Build
         run: cmake --build build --config Release
