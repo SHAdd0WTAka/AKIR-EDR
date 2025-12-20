@@ -19,9 +19,17 @@ jobs:
           cd "$env:VCPKG_INSTALLATION_ROOT"
           git fetch --unshallow
           git pull origin master
+          .\bootstrap-vcpkg.bat
 
       - name: Configure CMake
-        run: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+        run: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows
+
+      - name: Upload Vcpkg Logs (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: vcpkg-logs
+          path: build/vcpkg-manifest-install.log
 
       - name: Build
         run: cmake --build build --config Release
