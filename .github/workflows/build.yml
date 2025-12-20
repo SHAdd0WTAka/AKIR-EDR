@@ -11,12 +11,18 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Bootstrap Vcpkg
+        run: |
+          cd vcpkg
+          .\bootstrap-vcpkg.bat
 
       - name: Configure CMake
-        # Wir nutzen den Standard-vcpkg-Pfad des Runners, verzichten aber auf manuelle Updates
         run: |
           cmake -B build -S . `
-            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" `
+            -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" `
             -DVCPKG_MANIFEST_MODE=ON `
             -DVCPKG_TARGET_TRIPLET=x64-windows
 
