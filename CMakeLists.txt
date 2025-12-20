@@ -5,8 +5,8 @@ set(CMAKE_CXX_STANDARD 20)
 
 # Hardening Flags
 if(MSVC)
-    add_compile_options(/guard:cf /ZH:SHA_256 /CETCOMPAT /GS /W4 /WX)
-    add_link_options(/HIGHENTROPYVA /DYNAMICBASE /NXCOMPAT /GUARD:CF)
+    add_compile_options(/guard:cf /ZH:SHA_256 /GS /W4 /WX)
+    add_link_options(/HIGHENTROPYVA /DYNAMICBASE /NXCOMPAT /GUARD:CF /CETCOMPAT)
 endif()
 
 # Include Directories für das gesamte Projekt

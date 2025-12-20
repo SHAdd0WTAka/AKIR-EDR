@@ -8,11 +8,13 @@ using namespace std;
 
 // Dummy Helper Functions for PoC
 string GetKeyState(string admin) { 
+    (void)admin; // Suppress unused parameter warning
     // In production, query the secure local database
     return "ACTIVE"; 
 }
 
 bool VerifySecret(string inputUrl) {
+    (void)inputUrl; // Suppress unused parameter warning
     // Verify the cryptographic token embedded in the URL
     return true;
 }
@@ -27,8 +29,9 @@ void Log(string msg) {
 
 bool IsWithinWindow(int startHour, int startMin, int endHour, int endMin) {
     time_t now = time(0);
-    tm *ltm = localtime(&now);
-    int currentMin = ltm->tm_hour * 60 + ltm->tm_min;
+    tm ltm;
+    localtime_s(&ltm, &now); // Secure CRT function
+    int currentMin = ltm.tm_hour * 60 + ltm.tm_min;
     int start = startHour * 60 + startMin;
     int end = endHour * 60 + endMin;
     return (currentMin >= start && currentMin <= end);
