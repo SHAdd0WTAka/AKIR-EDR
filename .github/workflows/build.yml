@@ -14,12 +14,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Update Vcpkg Registry
+      - name: Ensure Vcpkg History
         run: |
           cd "$env:VCPKG_INSTALLATION_ROOT"
-          git fetch --unshallow
-          git pull origin master
-          .\bootstrap-vcpkg.bat
+          # Try to unshallow, ignore error if already complete
+          git fetch --unshallow origin || echo "Already unshallow or failed"
+          git fetch origin
 
       - name: Configure CMake
         run: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows
