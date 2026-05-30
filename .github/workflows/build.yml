@@ -47,26 +47,25 @@ jobs:
       - name: Check Binary Hardening (ASLR / DEP / SafeSEH)
         shell: powershell
         run: |
-           = "build/Release/AKIR_Agent.exe"
-          if (Test-Path ) {
+          $agent = "build/Release/AKIR_Agent.exe"
+          if (Test-Path $agent) {
             # Check ASLR (DLL characteristics 0x40 = DYNAMIC_BASE)
-             = Get-Item 
+            $pe = Get-Item $agent
             Add-Type -AssemblyName System.Reflection
-             = [System.IO.BinaryReader]::new([System.IO.File]::OpenRead(.FullName))
-            .BaseStream.Seek(0x3C, 0) | Out-Null
-             = .ReadUInt32()
-            .BaseStream.Seek( + 24, 0) | Out-Null
-             = .ReadUInt16()
-            .BaseStream.Seek( + 92 + 2, 0) | Out-Null
-            [int] = .ReadUInt16()
-            .Close()
-             = ( -band 0x40) -eq 0x40
-            Write-Host "ASLR (DYNAMIC_BASE): "
-            Write-Host "DLL Characteristics: 0x"
-            if (-not ) { throw "ASLR not enabled in binary!" }
+            $reader = [System.IO.BinaryReader]::new([System.IO.File]::OpenRead($pe.FullName))
+            $reader.BaseStream.Seek(0x3C, 0) | Out-Null
+            $peOffset = $reader.ReadUInt32()
+            $reader.BaseStream.Seek($peOffset + 24, 0) | Out-Null
+            $magic = $reader.ReadUInt16()
+            $reader.BaseStream.Seek($peOffset + 92 + 2, 0) | Out-Null
+            [int]$dllChar = $reader.ReadUInt16()
+            $reader.Close()
+            $aslr = ($dllChar -band 0x40) -eq 0x40
+            Write-Host "ASLR (DYNAMIC_BASE): $aslr"
+            if (-not $aslr) { throw "ASLR not enabled in binary!" }
             Write-Host "Binary hardening: OK" -ForegroundColor Green
           } else {
-            Write-Host "Agent binary not found at , skipping hardening check."
+            Write-Host "Agent binary not found at $agent, skipping hardening check."
           }
 
       - name: Upload Vcpkg Logs (on failure)
