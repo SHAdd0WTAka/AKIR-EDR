@@ -1,11 +1,12 @@
-cmake_minimum_required(VERSION 3.20)
+﻿cmake_minimum_required(VERSION 3.20)
 project(AKIR LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Hardening Flags
 if(MSVC)
-    add_compile_options(/guard:cf /ZH:SHA_256 /GS /W4 /WX)
+    add_compile_options(/guard:cf /ZH:SHA_256 /GS /W4 /WX /utf-8)
     add_link_options(/HIGHENTROPYVA /DYNAMICBASE /NXCOMPAT /GUARD:CF /CETCOMPAT)
 endif()
 

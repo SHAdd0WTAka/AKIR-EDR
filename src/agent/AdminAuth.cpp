@@ -1,3 +1,4 @@
+﻿#include <string_view>
 #include <iostream>
 #include <string>
 #include <ctime>
@@ -7,25 +8,25 @@
 using namespace std;
 
 // Dummy Helper Functions for PoC
-string GetAdminKeyState([[maybe_unused]] const string& admin) { // Suppress unused parameter warning
+[[nodiscard]] string GetAdminKeyState([[maybe_unused]] const string& admin) noexcept { // Suppress unused parameter warning
     // In production, query the secure local database
     return "ACTIVE"; 
 }
 
-bool VerifySecret([[maybe_unused]] const string& inputUrl) { // Suppress unused parameter warning
+[[nodiscard]] bool VerifySecret([[maybe_unused]] const string& inputUrl) noexcept { // Suppress unused parameter warning
     // Verify the cryptographic token embedded in the URL
     return true;
 }
 
-void ResetKernelTimer() {
+void ResetKernelTimer() noexcept {
     cout << "[KERNEL] Timer Reset via IOCTL Success." << endl;
 }
 
-void Log(const string& msg) {
+void Log(std::string_view msg) noexcept {
     cout << "[AUTH-LOG] " << msg << endl;
 }
 
-bool IsWithinWindow(int startHour, int startMin, int endHour, int endMin) {
+bool IsWithinWindow(int startHour, int startMin, int endHour, int endMin) noexcept {
     time_t now = time(0);
     tm ltm;
     localtime_s(&ltm, &now); // Secure CRT function
@@ -36,7 +37,7 @@ bool IsWithinWindow(int startHour, int startMin, int endHour, int endMin) {
 }
 
 // Implementiert den täglichen 14:30 - 15:30 Reset mit HTTPS->HTTP Trick
-bool ValidateAdminSession(const string& inputUrl) {
+bool ValidateAdminSession(const string& inputUrl) noexcept {
     string currentAdmin = "admin_user"; // Simplified
 
     // 1. Check: Nur ACTIVE Keys (nach 2FA Provisioning)
