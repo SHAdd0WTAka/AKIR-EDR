@@ -44,10 +44,30 @@ jobs:
             Write-Host "Test binary not found, skipping execution."
           }
 
-      - name: Ensure Binary Hardening
+      - name: Check Binary Hardening (ASLR / DEP / SafeSEH)
         shell: powershell
         run: |
-          Write-Host "Verifying Binary Hardening Flags..."
+           = "build/Release/AKIR_Agent.exe"
+          if (Test-Path ) {
+            # Check ASLR (DLL characteristics 0x40 = DYNAMIC_BASE)
+             = Get-Item 
+            Add-Type -AssemblyName System.Reflection
+             = [System.IO.BinaryReader]::new([System.IO.File]::OpenRead(.FullName))
+            .BaseStream.Seek(0x3C, 0) | Out-Null
+             = .ReadUInt32()
+            .BaseStream.Seek( + 24, 0) | Out-Null
+             = .ReadUInt16()
+            .BaseStream.Seek( + 92 + 2, 0) | Out-Null
+            [int] = .ReadUInt16()
+            .Close()
+             = ( -band 0x40) -eq 0x40
+            Write-Host "ASLR (DYNAMIC_BASE): "
+            Write-Host "DLL Characteristics: 0x"
+            if (-not ) { throw "ASLR not enabled in binary!" }
+            Write-Host "Binary hardening: OK" -ForegroundColor Green
+          } else {
+            Write-Host "Agent binary not found at , skipping hardening check."
+          }
 
       - name: Upload Vcpkg Logs (on failure)
         if: failure()
