@@ -7,14 +7,12 @@
 using namespace std;
 
 // Dummy Helper Functions for PoC
-string GetKeyState(string admin) { 
-    (void)admin; // Suppress unused parameter warning
+string GetAdminKeyState([[maybe_unused]] const string& admin) { // Suppress unused parameter warning
     // In production, query the secure local database
     return "ACTIVE"; 
 }
 
-bool VerifySecret(string inputUrl) {
-    (void)inputUrl; // Suppress unused parameter warning
+bool VerifySecret([[maybe_unused]] const string& inputUrl) { // Suppress unused parameter warning
     // Verify the cryptographic token embedded in the URL
     return true;
 }
@@ -23,7 +21,7 @@ void ResetKernelTimer() {
     cout << "[KERNEL] Timer Reset via IOCTL Success." << endl;
 }
 
-void Log(string msg) {
+void Log(const string& msg) {
     cout << "[AUTH-LOG] " << msg << endl;
 }
 
@@ -38,11 +36,11 @@ bool IsWithinWindow(int startHour, int startMin, int endHour, int endMin) {
 }
 
 // Implementiert den täglichen 14:30 - 15:30 Reset mit HTTPS->HTTP Trick
-bool ValidateAdminSession(string inputUrl) {
+bool ValidateAdminSession(const string& inputUrl) {
     string currentAdmin = "admin_user"; // Simplified
 
     // 1. Check: Nur ACTIVE Keys (nach 2FA Provisioning)
-    if (GetKeyState(currentAdmin) != "ACTIVE") return false;
+    if (GetAdminKeyState(currentAdmin) != "ACTIVE") return false;
 
     // 2. Check: Das Zeitfenster (Commented out for testing purposes in PoC, or keep logic strict)
     // if (!IsWithinWindow(14, 30, 15, 30)) return false; 
